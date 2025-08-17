@@ -151,7 +151,6 @@ function PlaceholderANN({ performanceLevel }: { performanceLevel: PerformanceLev
         const start = new THREE.Vector3(...connection.start)
         const end = new THREE.Vector3(...connection.end)
         const direction = end.clone().sub(start)
-        const length = direction.length()
         const position = start.clone().add(direction.clone().multiplyScalar(0.5))
         
         return (
