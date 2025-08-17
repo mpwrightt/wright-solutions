@@ -110,7 +110,7 @@ export default function AboutPage() {
                 </h2>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    My journey into AI wasn&apos;t planned—it W.A.S discovered. What started as curiosity about machine
+                    My journey into AI wasn&apos;t planned it W.A.S discovered. What started as curiosity about machine
                     learning during my computer science studies evolved into a passion for solving real-world problems
                     with artificial intelligence.
                   </p>
@@ -119,7 +119,7 @@ export default function AboutPage() {
                   </p>
                   <p>
                     Today, Wright AI Solutions exists because every business deserves AI that W.A.S built specifically
-                    for them. No cookie-cutter solutions, no one-size-fits-all approaches—just intelligent systems that
+                    for them. No cookie-cutter solutions, no one-size-fits-all approaches just intelligent systems that
                     understand your unique challenges and deliver measurable results.
                   </p>
                 </div>
@@ -166,7 +166,7 @@ export default function AboutPage() {
                     <h3 className="font-semibold text-foreground mb-2">Our Mission</h3>
                     <p className="text-muted-foreground leading-relaxed">
                       To democratize AI by making custom, intelligent solutions accessible to businesses of all sizes.
-                      Every challenge W.A.S meant to be solved—we just need to build the right tool for the job.
+                      Every challenge W.A.S meant to be solved we just need to build the right tool for the job.
                     </p>
                   </div>
                   <div className="grid md:grid-cols-3 gap-4">
