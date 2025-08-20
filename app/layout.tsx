@@ -19,24 +19,25 @@ const sourceSansPro = Source_Sans_Pro({
 })
 
 export const metadata: Metadata = {
-  title: "Lock In - Motivational Status Display",
+  title: "Wright AI Solutions - Custom AI Development & Consulting",
   description:
-    "Stay focused and motivated with a bold Lock In reminder and scrolling inspirational quotes.",
+    "Transform your business with custom AI applications, intelligent process automation, and advanced data analytics. Expert AI consulting services with measurable ROI.",
   keywords: [
-    "motivation",
-    "focus",
-    "productivity",
-    "lock in",
-    "inspirational quotes",
-    "status display"
+    "AI development",
+    "machine learning",
+    "custom AI solutions",
+    "AI consulting",
+    "business automation",
+    "data analytics",
+    "artificial intelligence"
   ],
-  authors: [{ name: "Lock In App" }],
-  creator: "Lock In App",
-  publisher: "Lock In App",
-  generator: "Lock In App",
+  authors: [{ name: "Wright AI Solutions" }],
+  creator: "Wright AI Solutions",
+  publisher: "Wright AI Solutions",
+  generator: "Wright AI Solutions",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
   viewport: {
     width: "device-width",

@@ -90,9 +90,9 @@ fi
 # 🔥 LIVE UPDATE SYSTEM - DAEMON INTEGRATION
 # ================================================================
 
-CACHE_FILE="$HOME/.claude/lock-in-cache.txt"
-DAEMON_SCRIPT="$HOME/.claude/lock-in-daemon.sh"
-PID_FILE="$HOME/.claude/lock-in-daemon.pid"
+CACHE_FILE="$HOME/.claude/wright-ai-cache.txt"
+DAEMON_SCRIPT="$HOME/.claude/wright-ai-daemon.sh"
+PID_FILE="$HOME/.claude/wright-ai-daemon.pid"
 
 # Auto-start daemon if not running
 if [ ! -f "$PID_FILE" ] || ! ps -p $(cat "$PID_FILE" 2>/dev/null) > /dev/null 2>&1; then
@@ -167,12 +167,12 @@ NEON_GREEN='\033[38;5;46m'
 RESET='\033[0m'
 
 # ================================================================
-# ⚔️ HERO'S QUEST HEADER - ULTRA-PRECISE ALIGNMENT - TRIFORCE MODE
+# 🤖 WRIGHT AI SOLUTIONS HEADER - ULTRA-PRECISE ALIGNMENT - AI DEVELOPMENT MODE
 # ================================================================
 
 # Build HERO'S QUEST header with EXACT 78-character width (+ borders = 80 total)
 printf "${RED_BOLD}+======================================================================================+${RESET}\n"
-printf "${RED_BOLD}|${RESET}      ${pulse_char} ${YELLOW_BOLD}⚔️ H E R O ' S   Q U E S T ⚔️${RESET} ${pulse_char}         ${WHITE_BOLD}TRIFORCE POWER ACTIVATED${RESET}       ${RED_BOLD}         |${RESET}\n"
+printf "${RED_BOLD}|${RESET}      ${pulse_char} ${YELLOW_BOLD}🤖 W R I G H T   A I   S O L U T I O N S 🤖${RESET} ${pulse_char}         ${WHITE_BOLD}AI DEVELOPMENT MODE${RESET}       ${RED_BOLD}         |${RESET}\n"
 printf "${RED_BOLD}+======================================================================================+${RESET}\n"
 
 # ================================================================
