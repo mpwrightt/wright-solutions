@@ -6,6 +6,8 @@ import { BenefitsSection } from "@/components/benefits-section"
 import { FAQSection } from "@/components/faq-section"
 import { CTASection } from "@/components/cta-section"
 import { Footer } from "@/components/footer"
+import { Chatbot } from "@/components/Chatbot"
+import { UserSegmentationDebug } from "@/components/AdaptiveContent"
 
 export default function HomePage() {
   return (
@@ -18,6 +20,10 @@ export default function HomePage() {
       <FAQSection />
       <CTASection />
       <Footer />
+      
+      {/* AI Personalization Features */}
+      <Chatbot />
+      <UserSegmentationDebug />
     </main>
   )
 }

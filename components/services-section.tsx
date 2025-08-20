@@ -1,5 +1,9 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Brain, Cog, BarChart3, Puzzle, Users } from "lucide-react"
+import { useRef } from "react"
+import { useIntersectionTracking } from "@/hooks/useInteractionTracking"
 
 const services = [
   {
@@ -30,8 +34,11 @@ const services = [
 ]
 
 export function ServicesSection() {
+  const sectionRef = useRef<HTMLDivElement>(null)
+  useIntersectionTracking(sectionRef, 'services')
+
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section ref={sectionRef} className="py-20 relative overflow-hidden">
       <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-accent rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-primary rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-1000"></div>
 

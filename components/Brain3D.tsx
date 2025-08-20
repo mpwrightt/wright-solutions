@@ -7,6 +7,9 @@ import { useSpring, animated } from '@react-spring/three'
 import * as THREE from 'three'
 import { useMotionPreference } from '@/hooks/useMotionPreference'
 import { useDevicePerformance, type PerformanceLevel } from '@/hooks/useDevicePerformance'
+import { use3DPerformanceMonitoring } from '@/hooks/usePerformanceMonitoring'
+import { InstancedNeuralNetwork } from '@/utils/instancedGeometry'
+import { ProceduralBrain3D } from './ProceduralBrain3D'
 
 // Performance configuration for different quality levels
 const PERFORMANCE_CONFIG = {
@@ -52,11 +55,12 @@ function Loader() {
   )
 }
 
-// Placeholder ANN geometry (will be replaced with actual model)
+// Optimized Placeholder ANN using instanced geometry
 function PlaceholderANN({ performanceLevel }: { performanceLevel: PerformanceLevel }) {
-  const meshRef = useRef<THREE.Mesh>(null)
+  const groupRef = useRef<THREE.Group>(null)
   const prefersReducedMotion = useMotionPreference()
   const [hovered, setHovered] = useState(false)
+  const performanceMonitoring = use3DPerformanceMonitoring()
 
   // Spring animation for hover effect
   const { scale } = useSpring({
@@ -64,113 +68,47 @@ function PlaceholderANN({ performanceLevel }: { performanceLevel: PerformanceLev
     config: { mass: 1, tension: 280, friction: 60 }
   })
 
-  useFrame((state) => {
-    if (!meshRef.current || prefersReducedMotion) return
-    
-    const time = state.clock.getElapsedTime()
-    
-    // Gentle floating animation
-    meshRef.current.position.y = Math.sin(time * 0.5) * 0.1
-    
-    // Subtle rotation
-    meshRef.current.rotation.y = time * 0.2
-  })
-
-  // Neural network geometry using nodes and connections
-  const networkGeometry = useMemo(() => {
-    // Node geometries for different layers
-    const nodeGeometry = new THREE.SphereGeometry(0.1, 8, 6)
-    const connectionGeometry = new THREE.CylinderGeometry(0.01, 0.01, 1, 4)
-    
-    return { nodeGeometry, connectionGeometry }
-  }, [])
-
-  // Generate neural network layers
-  const networkLayers = useMemo(() => {
+  // Create instanced neural network
+  const instancedNetwork = useMemo(() => {
     const layers = [
-      { nodes: 4, z: -1.5, color: '#ff6b6b' }, // Input layer
-      { nodes: 6, z: 0, color: '#4ecdc4' },     // Hidden layer 1
-      { nodes: 4, z: 1.5, color: '#45b7d1' }   // Output layer
+      { nodeCount: 4, position: new THREE.Vector3(0, 0, -1.5), color: '#ff6b6b' },
+      { nodeCount: 6, position: new THREE.Vector3(0, 0, 0), color: '#4ecdc4' },
+      { nodeCount: 4, position: new THREE.Vector3(0, 0, 1.5), color: '#45b7d1' }
     ]
+
+    return new InstancedNeuralNetwork(layers, performanceLevel)
+  }, [performanceLevel])
+
+  useFrame((state) => {
+    if (!groupRef.current || prefersReducedMotion) return
     
-    const nodes: Array<{ position: [number, number, number]; color: string }> = []
-    const connections: Array<{ start: [number, number, number]; end: [number, number, number] }> = []
-    
-    layers.forEach((layer, layerIndex) => {
-      for (let i = 0; i < layer.nodes; i++) {
-        const angle = (i / layer.nodes) * Math.PI * 2
-        const radius = 0.8
-        const position: [number, number, number] = [
-          Math.cos(angle) * radius,
-          Math.sin(angle) * radius,
-          layer.z
-        ]
-        nodes.push({ position, color: layer.color })
-        
-        // Create connections to next layer
-        if (layerIndex < layers.length - 1) {
-          const nextLayer = layers[layerIndex + 1]
-          for (let j = 0; j < nextLayer.nodes; j++) {
-            const nextAngle = (j / nextLayer.nodes) * Math.PI * 2
-            const nextPosition: [number, number, number] = [
-              Math.cos(nextAngle) * radius,
-              Math.sin(nextAngle) * radius,
-              nextLayer.z
-            ]
-            connections.push({ start: position, end: nextPosition })
-          }
-        }
-      }
+    performanceMonitoring.measureRenderTime(() => {
+      const time = state.clock.getElapsedTime()
+      
+      // Gentle floating animation
+      groupRef.current!.position.y = Math.sin(time * 0.5) * 0.1
+      
+      // Subtle rotation
+      groupRef.current!.rotation.y = time * 0.2
     })
-    
-    return { nodes, connections }
-  }, [])
+
+    // Track performance metrics
+    const complexity = performanceLevel === 'high' ? 100 : performanceLevel === 'medium' ? 50 : 25
+    performanceMonitoring.updateSceneMetrics(complexity, 1, 0)
+    performanceMonitoring.trackGPUOperation(1, complexity * 10)
+  })
 
   return (
     <animated.group 
-      ref={meshRef}
+      ref={groupRef}
       scale={scale}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      {/* Network nodes */}
-      {networkLayers.nodes.map((node, i) => (
-        <mesh key={`node-${i}`} position={node.position} geometry={networkGeometry.nodeGeometry}>
-          <meshStandardMaterial
-            color={hovered ? '#00ffff' : node.color}
-            metalness={0.3}
-            roughness={0.2}
-            emissive={hovered ? '#00ffff' : node.color}
-            emissiveIntensity={0.2}
-          />
-        </mesh>
-      ))}
+      <primitive object={instancedNetwork.getGroup()} />
       
-      {/* Network connections */}
-      {networkLayers.connections.map((connection, i) => {
-        const start = new THREE.Vector3(...connection.start)
-        const end = new THREE.Vector3(...connection.end)
-        const direction = end.clone().sub(start)
-        const position = start.clone().add(direction.clone().multiplyScalar(0.5))
-        
-        return (
-          <mesh 
-            key={`connection-${i}`} 
-            position={position.toArray()}
-            geometry={networkGeometry.connectionGeometry}
-            lookAt={end}
-          >
-            <meshBasicMaterial 
-              color={hovered ? '#00ffff' : '#ffffff'} 
-              transparent 
-              opacity={hovered ? 0.8 : 0.3}
-            />
-          </mesh>
-        )
-      })}
-      
-      {/* Data flow particles */}
-      {Array.from({ length: performanceLevel === 'high' ? 8 : 4 }, (_, i) => (
+      {/* Data flow particles - only for high performance */}
+      {performanceLevel === 'high' && Array.from({ length: 4 }, (_, i) => (
         <Float key={i} speed={1 + i * 0.2} rotationIntensity={0.1} floatIntensity={0.2}>
           <mesh position={[
             (Math.random() - 0.5) * 3,
@@ -178,7 +116,11 @@ function PlaceholderANN({ performanceLevel }: { performanceLevel: PerformanceLev
             (Math.random() - 0.5) * 3
           ]}>
             <sphereGeometry args={[0.02, 8, 6]} />
-            <meshBasicMaterial color="#00ffff" transparent opacity={0.8} />
+            <meshBasicMaterial 
+              color={hovered ? '#00ffff' : '#ffffff'} 
+              transparent 
+              opacity={0.8} 
+            />
           </mesh>
         </Float>
       ))}
@@ -187,33 +129,65 @@ function PlaceholderANN({ performanceLevel }: { performanceLevel: PerformanceLev
 }
 
 // GLTF ANN model component  
-function GLTFANNModel({ path }: { path: string }) {
-  const { scene } = useGLTF(path)
+function GLTFANNModel({ path }: { path: string; performanceLevel: PerformanceLevel }) {
   const meshRef = useRef<THREE.Group>(null)
   const prefersReducedMotion = useMotionPreference()
+  const performanceMonitoring = use3DPerformanceMonitoring()
+  
+  // Load GLTF model
+  const { scene: originalScene } = useGLTF(path)
+
+  // Optimize GLTF model
+  const optimizedScene = useMemo(() => {
+    // For now, just return the original scene
+    // Model optimization can be applied separately if needed
+    return originalScene
+  }, [originalScene])
 
   useFrame((state) => {
     if (!meshRef.current || prefersReducedMotion) return
     
-    const time = state.clock.getElapsedTime()
-    meshRef.current.rotation.y = time * 0.1
-    meshRef.current.position.y = Math.sin(time * 0.5) * 0.05
+    // Track performance
+    performanceMonitoring.measureRenderTime(() => {
+      const time = state.clock.getElapsedTime()
+      meshRef.current!.rotation.y = time * 0.1
+      meshRef.current!.position.y = Math.sin(time * 0.5) * 0.05
+    })
+
+    // Track GPU operations
+    performanceMonitoring.trackGPUOperation(1, 5000) // Estimate for GLTF model
   })
 
   return (
     <group ref={meshRef}>
-      <primitive object={scene} scale={2} />
+      <primitive object={optimizedScene} scale={2} />
     </group>
   )
 }
 
-// ANN model component (will load GLTF when available)
+// ANN model component with smart fallback
 function ANNModel({ path, performanceLevel }: { path?: string; performanceLevel: PerformanceLevel }) {
+  // Check if model file exists, fallback to procedural if not
   if (!path) {
-    return <PlaceholderANN performanceLevel={performanceLevel} />
+    return <ProceduralBrain3D performanceLevel={performanceLevel} />
   }
 
-  return <GLTFANNModel path={path} />
+  // Use error boundary to catch GLTF loading failures
+  return (
+    <Suspense fallback={<PlaceholderANN performanceLevel={performanceLevel} />}>
+      <GLTFModelWithFallback path={path} performanceLevel={performanceLevel} />
+    </Suspense>
+  )
+}
+
+// GLTF wrapper with procedural fallback
+function GLTFModelWithFallback({ path, performanceLevel }: { path: string; performanceLevel: PerformanceLevel }) {
+  try {
+    return <GLTFANNModel path={path} performanceLevel={performanceLevel} />
+  } catch {
+    console.warn('GLTF model failed to load, using procedural neural network')
+    return <ProceduralBrain3D performanceLevel={performanceLevel} />
+  }
 }
 
 // Lighting setup
@@ -289,6 +263,10 @@ export function Brain3D({ modelPath }: { modelPath?: string }) {
   const performanceLevel = useDevicePerformance()
   const prefersReducedMotion = useMotionPreference()
   const config = PERFORMANCE_CONFIG[performanceLevel]
+  
+  // Temporarily disable GLTF model until it's downloaded
+  // Use procedural neural network instead
+  const fallbackMode = !modelPath || modelPath === '/models/ann-model.glb'
 
   const canvasSettings = useMemo(() => ({
     camera: { position: [0, 0, 4] as [number, number, number], fov: 50 },
@@ -311,7 +289,10 @@ export function Brain3D({ modelPath }: { modelPath?: string }) {
         {...canvasSettings}
         frameloop={prefersReducedMotion ? 'demand' : 'always'}
       >
-        <Brain3DScene modelPath={modelPath} performanceLevel={performanceLevel} />
+        <Brain3DScene 
+          modelPath={fallbackMode ? undefined : modelPath} 
+          performanceLevel={performanceLevel} 
+        />
       </Canvas>
     </div>
   )

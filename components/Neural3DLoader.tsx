@@ -4,6 +4,7 @@ import { useState, useEffect, lazy, Suspense, Component, type ReactNode } from '
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import { useDevicePerformance } from '@/hooks/useDevicePerformance'
 import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring'
+import { useInteractionTracking } from '@/hooks/useInteractionTracking'
 
 // Lazy load the 3D component
 const Brain3D = lazy(() => 
@@ -148,6 +149,7 @@ export function Neural3DLoader() {
   const [ref, inView] = useIntersectionObserver({ threshold: 0.3 })
   const performanceLevel = useDevicePerformance()
   const performanceMetrics = usePerformanceMonitoring()
+  const { track3DInteraction } = useInteractionTracking()
 
   // Performance monitoring - fallback to 2D if performance drops
   useEffect(() => {
@@ -187,6 +189,7 @@ export function Neural3DLoader() {
     if (!hasInteracted && performanceLevel !== 'low' && !fallbackTo2D) {
       setHasInteracted(true)
       setShouldLoad3D(true)
+      track3DInteraction() // Track user interaction with 3D content
     }
   }
 

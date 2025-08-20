@@ -1,9 +1,15 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ArrowRight, Brain, Zap, Sparkles } from "lucide-react"
+import { ArrowRight, Sparkles } from "lucide-react"
 import { Neural3DLoader } from "@/components/Neural3DLoader"
+import { AdaptiveHeroContent, AdaptiveTrustIndicators, AdaptiveServiceHighlights } from "@/components/AdaptiveContent"
+import { useInteractionTracking } from "@/hooks/useInteractionTracking"
 
 export function HeroSection() {
+  const { trackCtaClick } = useInteractionTracking()
+
   return (
     <section className="relative py-20 lg:py-32 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-accent/2 via-transparent to-primary/2"></div>
@@ -15,13 +21,44 @@ export function HeroSection() {
           {/* Content */}
           <div className="space-y-8">
             <div className="space-y-4">
-              <h1 className="text-4xl lg:text-6xl font-bold font-serif leading-tight">
-                <span className="text-gradient-primary">Custom AI Development</span>
-                <br />
-                <span className="text-foreground">& Machine Learning</span>
-                <br />
-                <span className="text-gradient-accent">Consulting</span>
-              </h1>
+              {/* Adaptive Hero Content with fallback */}
+              <AdaptiveHeroContent
+                fallback={
+                  <>
+                    <h1 className="text-4xl lg:text-6xl font-bold font-serif leading-tight">
+                      <span className="text-gradient-primary">Custom AI Development</span>
+                      <br />
+                      <span className="text-foreground">& Machine Learning</span>
+                      <br />
+                      <span className="text-gradient-accent">Consulting</span>
+                    </h1>
+                    
+                    <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                      <Button
+                        asChild
+                        size="lg"
+                        className="bg-gradient-accent hover:opacity-90 text-lg px-8 shadow-lg shadow-accent/25"
+                        onClick={() => trackCtaClick('primary')}
+                      >
+                        <Link href="/contact" className="flex items-center gap-2">
+                          Schedule Free Discovery Call
+                          <ArrowRight className="h-5 w-5" />
+                        </Link>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="lg"
+                        className="text-lg px-8 border-accent/50 hover:bg-accent/10 hover:border-accent bg-transparent"
+                        onClick={() => trackCtaClick('secondary')}
+                      >
+                        <Link href="/services">Learn More</Link>
+                      </Button>
+                    </div>
+                  </>
+                }
+              />
+              
               <p className="text-xl text-accent font-semibold flex items-center gap-2">
                 <Sparkles className="h-5 w-5" />
                 Your AI Solution W.A.S Here The Whole Time
@@ -31,38 +68,11 @@ export function HeroSection() {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                asChild
-                size="lg"
-                className="bg-gradient-accent hover:opacity-90 text-lg px-8 shadow-lg shadow-accent/25"
-              >
-                <Link href="/contact" className="flex items-center gap-2">
-                  Schedule Free Discovery Call
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="text-lg px-8 border-accent/50 hover:bg-accent/10 hover:border-accent bg-transparent"
-              >
-                <Link href="/services">Learn More</Link>
-              </Button>
-            </div>
+            {/* Adaptive Trust Indicators */}
+            <AdaptiveTrustIndicators />
 
-            {/* Trust indicators */}
-            <div className="flex items-center gap-6 pt-4">
-              <div className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-accent" />
-                <span className="text-sm text-muted-foreground">AI Expert</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-accent" />
-                <span className="text-sm text-muted-foreground">Custom Solutions</span>
-              </div>
-            </div>
+            {/* Personalized Service Highlights */}
+            <AdaptiveServiceHighlights />
           </div>
 
           {/* Hero Visual */}
