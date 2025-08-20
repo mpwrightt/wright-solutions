@@ -61,3 +61,6 @@ export function ScrollingQuotes() {
     </footer>
   )
 }
+
+// Export Footer as an alias for ScrollingQuotes to maintain compatibility
+export const Footer = ScrollingQuotes
